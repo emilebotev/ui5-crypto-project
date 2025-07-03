@@ -1,0 +1,67 @@
+<mvc:View
+    controllerName="sap.ui5.crypto.controller.View"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:u="sap.ui.unified"
+    xmlns:core="sap.ui.core"
+    height="100%"
+>
+    <Page
+        id="page"
+        class="sapUiContentPadding sapUiMediumPadding"
+        showNavButton="true"
+        showHeader="true"
+        title="{i18n>appTitle}"
+        showSubHeader="true"
+    >
+        <subHeader>
+            <Bar id="NavItemsBar">
+                <contentLeft>
+                    <Button
+                        id="NavHome"
+                        text="Home"
+                    />
+                    <Button
+                        id="NavNews"
+                        text="News"
+                    />
+                </contentLeft>
+                <contentMiddle>
+                    <mvc:XMLView
+                        viewName="sap.ui5.crypto.view.SearchInput"
+                        id="headerView"
+                    />
+                </contentMiddle>
+                <contentRight>
+                    <mvc:XMLView
+                        viewName="sap.ui5.crypto.view.CurrencyPicker"
+                        id="CurrencySelect"
+                    />
+                </contentRight>
+            </Bar>
+        </subHeader>
+
+        <content>
+            <NavContainer id="NavContainer">
+                <mvc:XMLView
+                    viewName="sap.ui5.crypto.view.Table"
+                    id="tableView"
+                />
+            </NavContainer>
+        </content>
+        <footer>
+            <OverflowToolbar id="OverFlowToolbarFooterTMC">
+                <Button
+                    id="LoadPreviousButton"
+                    text="Load Previous page"
+                    press=".onLoadPreviousPage"
+                />
+                <Button
+                    id="LoadMoreButton"
+                    text="Load Next page"
+                    press=".onLoadNextPage"
+                />
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

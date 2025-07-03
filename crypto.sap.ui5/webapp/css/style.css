@@ -1,0 +1,10 @@
+/* Enter your custom styles here */
+html, body, #content {
+    height: 100%;
+    margin: 0;
+  }
+
+  .sapMPopoverCont, .customCurrenciesDropdown {
+    max-height: 200px !important;
+  }
+

@@ -1,0 +1,17 @@
+{
+    "authenticationMethod": "none",
+    "routes": [
+        {
+            "source": "^/api/(.*)$",
+            "target": "$1",
+            "destination": "CoinGeckoAPIKey",
+            "csrfProtection": false
+          },
+          {
+            "source": "^(.*)$",
+            "target": "$1",
+            "localDir": "webapp",
+            "authenticationType": "none"
+          }
+    ]
+}
