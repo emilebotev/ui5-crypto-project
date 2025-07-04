@@ -14,7 +14,6 @@ export default class CryptoModel extends JSONModel {
 
   constructor() {
     super({ selectedCurrency: "usd" });
-    console.log("Crypto model initialized")
   }
 
   private incrementPage() {

@@ -9,11 +9,12 @@ import {
 import Filter from "sap/ui/model/Filter";
 import JSONListBinding from "sap/ui/model/json/JSONListBinding";
 import FilterOperator from "sap/ui/model/FilterOperator";
+import BaseController from "./BaseController";
 
 /**
- * @namespace sap.ui5.crypto.controller
+ * @namespace sap.ui5.crypto.controller.View
  */
-export default class View extends Controller {
+export default class View extends BaseController {
   private cryptoModel: CryptoModel;
   private oResizeObserver: ResizeObserver;
   formatter = Formatter;
@@ -21,26 +22,18 @@ export default class View extends Controller {
   onBeforeRendering(): void {
     // Get the already nitialized the CryptoModel
 
-    const view = this.getView();
-
-    if (!view) {
-      console.error("View is undefined");
-      return;
-    }
-    const cryptoModel = view.getModel("cryptoModel")
+    const cryptoModel = this.getTypedModel<CryptoModel>("cryptoModel")
     if(!cryptoModel){
       console.error("Crypto Model is not defined", cryptoModel);
       return
     }
-    this.cryptoModel = cryptoModel as CryptoModel
+    this.cryptoModel = cryptoModel
     // Load the available vs_currencies from the API
     this.cryptoModel.loadSupportedCurrencies();
 
     // Load the top 20 cryptocurrencies from the API
     this.cryptoModel.getTopMarketCap();
 
-    // Bind the model to the view
-    this.getView()?.setModel(this.cryptoModel, "cryptoModel");
   }
 
   onLoadNextPage() {
