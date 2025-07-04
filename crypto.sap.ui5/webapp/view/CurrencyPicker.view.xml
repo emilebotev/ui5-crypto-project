@@ -4,24 +4,34 @@
     xmlns="sap.m"
     xmlns:u="sap.ui.unified"
     xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
     viewName="sap.ui5.crypto.view.CurrencyPicker"
     id="CurrencyPicker"
 >
-    <ComboBox
-        id="CurrencyComboboxComboBox"
-        class="customCurrenciesDropdown sapUiSmallMarginRight"
-        selectedKey="{cryptoModel>/selectedCurrency}"
-        selectionChange="onCurrencyChange"
-        change="onValueChange"
-        items="{
+    <l:HorizontalLayout id="blockLytaout">
+        <Label
+            text="Currency  "
+            class="sapUiSmallMargin"
+            id="CurrencyText"
+            labelFor="CurrencyComboboxComboBox"
+        />
+
+        <ComboBox
+            id="CurrencyComboboxComboBox"
+            class="customCurrenciesDropdown sapUiSmallMarginRight"
+            selectedKey="{cryptoModel>/selectedCurrency}"
+            selectionChange="onCurrencyChange"
+            change="onValueChange"
+            items="{
                     path: 'cryptoModel>/supportedCurrencies'
                 }"
-        showClearIcon="true"
-    >
-        <core:Item
-            key="{cryptoModel>code}"
-            text="{parts:[{ path: 'cryptoModel>code'}], formatter: '.formatter.formatCurrencySign'}"
-            id="id"
-        />
-    </ComboBox>
+            showClearIcon="true"
+        >
+            <core:Item
+                key="{cryptoModel>code}"
+                text="{parts:[{ path: 'cryptoModel>code'}], formatter: '.formatter.formatCurrencySign'}"
+                id="id"
+            />
+        </ComboBox>
+    </l:HorizontalLayout>
 </mvc:XMLView>

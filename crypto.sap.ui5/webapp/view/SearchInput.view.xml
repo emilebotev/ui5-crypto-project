@@ -4,92 +4,69 @@
     xmlns="sap.m"
     xmlns:u="sap.ui.unified"
     xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
     viewName="sap.ui5.crypto.view.SearchInput"
     id="PageHeaderView"
 >
     <HeaderContainer id="headercontainer">
-        <Label
-            text="Search"
-            labelFor="SearchInput"
-            id="InputLabel"
-        />
-        <Input
-            id="SearchInput"
-            width="200px"
-            showSuggestion="true"
-            placeholder="Search by name or symbol..."
-            suggest="onSuggest"
-            suggestionRows="{
+        <l:HorizontalLayout id="SearchHorizontalLayout">
+            <Label
+                text="Search"
+                labelFor="SearchInput"
+                id="InputLabel"
+                class="sapUiSmallMargin"
+            />
+            <Input
+                id="SearchInput"
+                width="200px"
+                showSuggestion="true"
+                placeholder="Search by name or symbol..."
+                suggest="onSuggest"
+                suggestionRows="{
                      path: 'cryptoModel>/crypto'
                     }"
-            value="{cryptoModel>/searchValue}"
-        >
-            <suggestionColumns>
-                <Column
-                    id="column1"
-                    width="30px"
-                />
-                <Column id="column2">
-                    <Text
-                        id="text2"
-                        text="Name"
-                    />
-                </Column>
-                <Column id="column3">
-                    <Text
-                        id="text3"
-                        text="Symbol"
-                    />
-                </Column>
-            </suggestionColumns>
-
-            <suggestionRows>
-                <ColumnListItem id="ColumnListItem">
-                    <cells>
-                        <Image
-                            id="ColumnListItemImage"
-                            src="{cryptoModel>image}"
-                            width="15px"
-                            height="15px"
-                        />
-                        <Text
-                            id="ColumnListItemText"
-                            text="{cryptoModel>name}"
-                        />
-                        <Text
-                            id="ColumnListItemSymbol"
-                            text="{cryptoModel>symbol}"
-                        />
-                    </cells>
-                </ColumnListItem>
-            </suggestionRows>
-        </Input>
-        <Toolbar
-            id="PageToolBar"
-            width="100%"
-            class="sapUiMediumPadding"
-        >
-            <Label
-                text="Currency:"
-                id="CurrencyText"
-            />
-            <!-- <ComboBox
-                id="CurrencyComboboxComboBox"
-                class="customCurrenciesDropdown sapUiSmallMarginRight"
-                selectedKey="{cryptoModel>/selectedCurrency}"
-                selectionChange="onCurrencyChange"
-                change="onValueChange"
-                items="{
-                    path: 'cryptoModel>/supportedCurrencies'
-                }"
-                showClearIcon="true"
+                value="{cryptoModel>/searchValue}"
             >
-                <core:Item
-                    key="{cryptoModel>code}"
-                    text="{parts:[{ path: 'cryptoModel>code'}], formatter: '.formatter.formatCurrencySign'}"
-                    id="id"
-                />
-            </ComboBox> -->
-        </Toolbar>
+                <suggestionColumns>
+                    <Column
+                        id="column1"
+                        width="30px"
+                    />
+                    <Column id="column2">
+                        <Text
+                            id="text2"
+                            text="Name"
+                        />
+                    </Column>
+                    <Column id="column3">
+                        <Text
+                            id="text3"
+                            text="Symbol"
+                        />
+                    </Column>
+                </suggestionColumns>
+
+                <suggestionRows>
+                    <ColumnListItem id="ColumnListItem">
+                        <cells>
+                            <Image
+                                id="ColumnListItemImage"
+                                src="{cryptoModel>image}"
+                                width="15px"
+                                height="15px"
+                            />
+                            <Text
+                                id="ColumnListItemText"
+                                text="{cryptoModel>name}"
+                            />
+                            <Text
+                                id="ColumnListItemSymbol"
+                                text="{cryptoModel>symbol}"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </suggestionRows>
+            </Input>
+        </l:HorizontalLayout>
     </HeaderContainer>
 </mvc:XMLView>
