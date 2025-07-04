@@ -20,11 +20,11 @@
 
 ## crypto.sap.ui5
 
-An SAP Fiori application for training purposes dedicated for Crypro currencies price action analysis.
+A SAP Fiori application for training purposes dedicated to Crypro currencies price action analysis.
 
 ### Starting the generated app
 
-- This app has been generated using the SAP Fiori tools - App Generator, as part of the SAP Fiori tools suite. In order to launch the generated app, simply run the following from the generated app root folder:
+- This app has been generated using the SAP Fiori tools - App Generator, as part of the SAP Fiori tools suite. In order to launch the generated app, simply run the following from the generated app root folder (in this case crypto.sap.ui5):
 
 ```
     npm start
@@ -43,7 +43,7 @@ An SAP Fiori application for training purposes dedicated for Crypro currencies p
 
    ![form-screenshot-1](image.png)
 
-   Set the Additional properties set as follows:
+   Set the Additional properties as follows:
 
    ![form-screenshot-2](image-1.png)
 

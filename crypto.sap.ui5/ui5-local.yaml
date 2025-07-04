@@ -14,11 +14,6 @@ framework:
     - name: themelib_sap_horizon
 server:
   customMiddleware:
-    - name: dotenv-middleware
-      mountPath: /env
-      afterMiddleware: compression
-      configuration: {}
-      path: ./middleware/middleware.js
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
