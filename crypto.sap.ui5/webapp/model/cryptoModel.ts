@@ -1,14 +1,35 @@
 import JSONModel from "sap/ui/model/json/JSONModel";
 import Log from "sap/base/Log";
 import { Model$RequestFailedEvent } from "sap/ui/model/Model";
-
+import { getEnvironment } from "../utils/getEnvironment";
+import { CG_API_KEY } from "./../utils/local-dev-credentials";
 export default class CryptoModel extends JSONModel {
-  private API_BASE_URL = "https://api.coingecko.com/api/v3/";
+  // Fixing the API Base URL to match the one streamlining to CoinGecko with needed Authntication, handled in destinations
+  private API_BASE_URL = "/api/";
+  private API_BASE_URL_LOCAL = "https://api.coingecko.com/api/v3/";
   private COINS_PATH = "coins/markets";
   private SUPPORTED_CURRENCIES_PATH = "simple/supported_vs_currencies";
   private headers = {
     accept: "application/json",
   };
+
+  private getBaseUrl() {
+    const env = getEnvironment();
+
+    if (env === "dev") {
+      return this.API_BASE_URL_LOCAL;
+    }
+
+    return this.API_BASE_URL;
+  }
+
+  private getHeaders() {
+    const env = getEnvironment();
+    if (env === "dev") {
+      return { ...this.headers, "x-cg-demo-api-key": CG_API_KEY };
+    }
+    return this.headers;
+  }
 
   private page = 1;
 
@@ -23,12 +44,11 @@ export default class CryptoModel extends JSONModel {
     this.page = this.page - 1;
   }
 
-
   public getTopMarketCap(numberOfResults = 20) {
-    const url = this.API_BASE_URL + this.COINS_PATH;
+    const url = this.getBaseUrl() + this.COINS_PATH;
     const vs_currency = this.getProperty("/selectedCurrency");
     const oParameters = {
-      vs_currency: vs_currency,
+      vs_currency,
       per_page: numberOfResults,
       page: this.page,
     };
@@ -42,7 +62,7 @@ export default class CryptoModel extends JSONModel {
       "GET",
       false,
       false,
-      this.headers
+      this.getHeaders()
     );
 
     oTempModel.attachRequestCompleted((oEvent) => {
@@ -53,9 +73,9 @@ export default class CryptoModel extends JSONModel {
         this.setProperty("/crypto", oTempModel.getData());
       } else {
         Log.error(
-          `Failed to load page ${this.page} of top ${
-            numberOfResults
-          } cryptocurrencies. Status: ${(
+          `Failed to load page ${
+            this.page
+          } of top ${numberOfResults} cryptocurrencies. Status: ${(
             oEvent as Model$RequestFailedEvent
           ).getParameter("statusCode")}`
         );
@@ -79,10 +99,10 @@ export default class CryptoModel extends JSONModel {
   }
 
   public loadSupportedCurrencies() {
-    const url = this.API_BASE_URL + this.SUPPORTED_CURRENCIES_PATH;
+    const url = this.getBaseUrl() + this.SUPPORTED_CURRENCIES_PATH;
     const oTempModel = new JSONModel();
 
-    oTempModel.loadData(url, {}, true, "GET", false, true, this.headers);
+    oTempModel.loadData(url, {}, true, "GET", false, true, this.getHeaders());
 
     oTempModel.attachRequestCompleted((oEvent) => {
       if (oEvent.getParameter("success")) {

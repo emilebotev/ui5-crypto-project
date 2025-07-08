@@ -27,26 +27,17 @@
                     />
                 </contentLeft>
                 <contentMiddle>
-                    <mvc:XMLView
-                        viewName="sap.ui5.crypto.view.SearchInput"
-                        id="headerView"
-                    />
+                     <core:Fragment fragmentName="sap.ui5.crypto.fragment.SearchInput" type="XML" />
                 </contentMiddle>
                 <contentRight>
-                    <mvc:XMLView
-                        viewName="sap.ui5.crypto.view.CurrencyPicker"
-                        id="CurrencySelect"
-                    />
+                 <core:Fragment fragmentName="sap.ui5.crypto.fragment.CurrencyPicker" type="XML" />
                 </contentRight>
             </Bar>
         </subHeader>
 
         <content>
             <NavContainer id="NavContainer">
-                <mvc:XMLView
-                    viewName="sap.ui5.crypto.view.Table"
-                    id="tableView"
-                />
+                 <core:Fragment fragmentName="sap.ui5.crypto.fragment.Table" type="XML" />
             </NavContainer>
         </content>
         <footer>

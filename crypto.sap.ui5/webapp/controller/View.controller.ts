@@ -1,39 +1,52 @@
-import Controller from "sap/ui/core/mvc/Controller";
-import CryptoModel from "../model/cryptoModel";
-import Formatter from "../utils/Formatter";
-import { Select$ChangeEvent } from "sap/m/Select";
 import {
   SearchField$SearchEvent,
   SearchField$SuggestEvent,
 } from "sap/m/SearchField";
 import Filter from "sap/ui/model/Filter";
 import JSONListBinding from "sap/ui/model/json/JSONListBinding";
+
 import FilterOperator from "sap/ui/model/FilterOperator";
 import BaseController from "./BaseController";
+
+import CryptoModel from "../model/cryptoModel";
+import Formatter from "../utils/Formatter";
+import Controller from "sap/ui/core/mvc/Controller";
+import { Select$ChangeEvent } from "sap/m/Select";
 
 /**
  * @namespace sap.ui5.crypto.controller.View
  */
-export default class View extends BaseController {
+export default class View extends Controller {
   private cryptoModel: CryptoModel;
   private oResizeObserver: ResizeObserver;
   formatter = Formatter;
 
   onBeforeRendering(): void {
-    // Get the already nitialized the CryptoModel
+    // Get the already initialized CryptoModel
+    const view = this.getView();
 
-    const cryptoModel = this.getTypedModel<CryptoModel>("cryptoModel")
-    if(!cryptoModel){
-      console.error("Crypto Model is not defined", cryptoModel);
-      return
+    if(!view){
+      console.error("View is not initialized or is undefined");
+      return;
     }
-    this.cryptoModel = cryptoModel
+
+    const cryptoModel = view.getModel("cryptoModel");
+    if (!cryptoModel) {
+      console.error("Crypto Model is not defined", cryptoModel);
+      return;
+    }
+    this.cryptoModel = cryptoModel as CryptoModel;
     // Load the available vs_currencies from the API
     this.cryptoModel.loadSupportedCurrencies();
 
     // Load the top 20 cryptocurrencies from the API
     this.cryptoModel.getTopMarketCap();
+  }
 
+  onCurrencyChange(oEvent: Select$ChangeEvent) {
+    const newCurrency = oEvent.getParameter("selectedItem")?.getKey();
+    this.cryptoModel.changeSelectedCurrency(newCurrency as string);
+    this.cryptoModel.getTopMarketCap();
   }
 
   onLoadNextPage() {
@@ -41,12 +54,6 @@ export default class View extends BaseController {
   }
   onLoadPreviousPage() {
     this.cryptoModel.loadPreviousTopMarketCap();
-  }
-
-  onCurrencyChange(oEvent: Select$ChangeEvent) {
-    const newCurrency = oEvent.getParameter("selectedItem")?.getKey();
-    this.cryptoModel.changeSelectedCurrency(newCurrency as string);
-    this.cryptoModel.getTopMarketCap();
   }
 
   onSearch(oEvenet: SearchField$SearchEvent) {
