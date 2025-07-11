@@ -6,41 +6,129 @@ import Filter from "sap/ui/model/Filter";
 import JSONListBinding from "sap/ui/model/json/JSONListBinding";
 
 import FilterOperator from "sap/ui/model/FilterOperator";
-import BaseController from "./BaseController";
-
 import CryptoModel from "../model/cryptoModel";
 import Formatter from "../utils/Formatter";
 import Controller from "sap/ui/core/mvc/Controller";
 import { Select$ChangeEvent } from "sap/m/Select";
+import { Table$RowSelectionChangeEvent } from "sap/ui/table/Table";
+import Table from "sap/ui/table/Table";
+import UIComponent from "sap/ui/core/UIComponent";
+import BaseController from "./BaseController.controller";
+import NavContainer from "sap/m/NavContainer";
+import Control from "sap/ui/core/Control";
+import SapEvent from "sap/ui/base/Event";
+import dataTableUtils from "sap/ui/test/gherkin/dataTableUtils";
+
+interface RowClickHandler {
+  domRef: HTMLElement;
+  handler: (e: Event) => void;
+}
 
 /**
  * @namespace sap.ui5.crypto.controller.View
  */
-export default class View extends Controller {
+export default class View extends BaseController {
   private cryptoModel: CryptoModel;
   private oResizeObserver: ResizeObserver;
   formatter = Formatter;
+  private pollIntervalId: number | undefined;
+  private rowClickHandlers: RowClickHandler[] = [];
 
   onBeforeRendering(): void {
     // Get the already initialized CryptoModel
     const view = this.getView();
 
-    if(!view){
+    if (!view) {
       console.error("View is not initialized or is undefined");
       return;
     }
 
-    const cryptoModel = view.getModel("cryptoModel");
+    const cryptoModel = this.getTypedModel<CryptoModel>("cryptoModel");
     if (!cryptoModel) {
       console.error("Crypto Model is not defined", cryptoModel);
       return;
     }
-    this.cryptoModel = cryptoModel as CryptoModel;
+    this.cryptoModel = cryptoModel;
     // Load the available vs_currencies from the API
     this.cryptoModel.loadSupportedCurrencies();
 
     // Load the top 20 cryptocurrencies from the API
     this.cryptoModel.getTopMarketCap();
+
+    //Start polling if not already started
+    this.startPolling();
+  }
+
+  onAfterRendering() {
+    // Get reference to the Crypto table
+    const oTable = this.byId("cryptoTable") as Table;
+
+    if (!oTable) {
+      console.error("Table was not found by id", oTable);
+      return;
+    }
+
+    // Attach event for rows updated
+    oTable.attachEvent("rowsUpdated", () => {
+      this.clearRowClickHandlers();
+      const aRows = oTable.getRows();
+
+      aRows.forEach((row) => {
+        const rowDomRef = row.getDomRef() as HTMLElement | null;
+        if (!rowDomRef) {
+          console.error("Dom ref is not found", rowDomRef);
+          return;
+        }
+        // Change the cursor, so the items would look clickable
+        rowDomRef.style.cursor = "pointer";
+        const oContext = row.getBindingContext("cryptoModel");
+        const sId = oContext?.getProperty("symbol");
+
+        if (!sId) {
+          console.error("Id of the row not found");
+        }
+        const handler = () => this.handleRowClick(sId);
+
+        // Attach click event listener to each row
+
+        rowDomRef.addEventListener("click", handler);
+
+        // Save reference to each and every domref and its click handler to be able to remove onExit
+        this.rowClickHandlers.push({
+          domRef: rowDomRef as HTMLElement,
+          handler,
+        });
+      });
+    });
+  }
+
+  private handleRowClick(cryptoId: string) {
+    const oRouter = UIComponent.getRouterFor(this);
+    oRouter.navTo("CryptoDetail", { cryptoId });
+  }
+
+  public handlePageNav() {
+    const oNavContainer = this.byId("NavContainer") as NavContainer;
+    oNavContainer.back();
+  }
+
+  private startPolling() {
+    if (this.pollIntervalId) {
+      return;
+    }
+
+    this.pollIntervalId = window.setInterval(() => {
+      this.cryptoModel.getTopMarketCap();
+    }, 60 * 1000);
+    console.info("Started polling getTopMarketCap every 60s");
+  }
+
+  private stopPolling(): void {
+    if (this.pollIntervalId) {
+      window.clearInterval(this.pollIntervalId);
+      this.pollIntervalId = undefined;
+      console.info("Stopped polling getTopMarketCap");
+    }
   }
 
   onCurrencyChange(oEvent: Select$ChangeEvent) {
@@ -81,7 +169,16 @@ export default class View extends Controller {
     searchfield.suggest();
   }
 
+  private clearRowClickHandlers() {
+    this.rowClickHandlers.forEach(({ domRef, handler }) => {
+      domRef.removeEventListener("click", handler);
+    });
+    this.rowClickHandlers = [];
+  }
+
   onExit(): void | undefined {
     this.oResizeObserver.disconnect();
+    this.stopPolling();
+    this.clearRowClickHandlers();
   }
 }

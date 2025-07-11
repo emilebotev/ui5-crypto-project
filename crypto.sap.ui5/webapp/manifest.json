@@ -73,15 +73,26 @@
       },
       "routes": [
         {
-          "name": "RouteView",
-          "pattern": ":?query:",
-          "target": ["TargetView"]
+          "pattern": "",
+          "name": "View",
+          "target": "View"
+        },
+        {
+          "pattern": "crypto/{cryptoId}",
+          "name": "CryptoDetail",
+          "target": "CryptoDetail"
         }
       ],
       "targets": {
-        "TargetView": {
-          "id": "View",
-          "name": "View"
+        "View" : {
+          "viewId": "View",
+          "viewName": "View",
+          "viewLevel": 1
+        },
+        "CryptoDetail": {
+          "viewId": "CryptoDetail",
+          "viewName": "CryptoDetail",
+          "viewLevel": 2
         }
       }
     },

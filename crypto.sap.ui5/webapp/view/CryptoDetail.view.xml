@@ -1,0 +1,11 @@
+<mvc:View
+    controllerName="sap.ui5.crypto.controller.CryptoDetail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:u="sap.ui.unified"
+    xmlns:core="sap.ui.core"
+    height="100%"
+    id="CryptoDetail"
+>
+    <Text id="CryptoDetailText" text="CryptoDetail"></Text>
+</mvc:View>

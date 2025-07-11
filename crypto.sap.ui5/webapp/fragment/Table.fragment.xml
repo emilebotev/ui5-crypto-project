@@ -55,7 +55,7 @@
                             width="17px"
                             height="17px"
                         />
-                        <Text text="{cryptoModel>name}" id="CryptoModelNameInTableText"/>
+                        <Text text="{cryptoModel>name}" id="CryptoModelNameInTableText" class="cursor-pointer"/>
                     </HBox>
                 </t:template>
             </t:Column>

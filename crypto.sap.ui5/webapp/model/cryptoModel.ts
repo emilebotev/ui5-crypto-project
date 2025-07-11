@@ -13,6 +13,12 @@ export default class CryptoModel extends JSONModel {
     accept: "application/json",
   };
 
+  private page = 1;
+
+  constructor() {
+    super({ selectedCurrency: "usd" });
+  }
+
   private getBaseUrl() {
     const env = getEnvironment();
 
@@ -31,11 +37,6 @@ export default class CryptoModel extends JSONModel {
     return this.headers;
   }
 
-  private page = 1;
-
-  constructor() {
-    super({ selectedCurrency: "usd" });
-  }
 
   private incrementPage() {
     this.page = this.page + 1;
@@ -67,7 +68,7 @@ export default class CryptoModel extends JSONModel {
 
     oTempModel.attachRequestCompleted((oEvent) => {
       if (oEvent.getParameter("success")) {
-        Log.info(
+        console.info(
           `Page ${this.page} of top ${numberOfResults} cryptocurrencies was loaded succesfully`
         );
         this.setProperty("/crypto", oTempModel.getData());
