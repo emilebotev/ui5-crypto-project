@@ -84,7 +84,7 @@
         }
       ],
       "targets": {
-        "View" : {
+        "View": {
           "viewId": "View",
           "viewName": "View",
           "viewLevel": 1

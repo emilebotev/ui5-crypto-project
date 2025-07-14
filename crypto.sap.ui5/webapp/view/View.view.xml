@@ -43,7 +43,6 @@
             </Bar>
         </subHeader>
 
-        <!-- <NavContainer id="NavContainer"> -->
             <Page
                 id="TopMarketCapPage"
                 class="sapUiContentPadding sapUiMediumPadding"
@@ -71,10 +70,5 @@
                     </OverflowToolbar>
                 </footer>
             </Page>
-            <!-- <mvc:XMLView
-                id="CryptoDetailPage"
-                viewName="sap.ui5.crypto.view.CryptoDetail"
-            />
-        </NavContainer> -->
     </Page>
 </mvc:View>

@@ -2,22 +2,16 @@ import {
   SearchField$SearchEvent,
   SearchField$SuggestEvent,
 } from "sap/m/SearchField";
+import { Select$ChangeEvent } from "sap/m/Select";
 import Filter from "sap/ui/model/Filter";
 import JSONListBinding from "sap/ui/model/json/JSONListBinding";
 
 import FilterOperator from "sap/ui/model/FilterOperator";
 import CryptoModel from "../model/cryptoModel";
 import Formatter from "../utils/Formatter";
-import Controller from "sap/ui/core/mvc/Controller";
-import { Select$ChangeEvent } from "sap/m/Select";
-import { Table$RowSelectionChangeEvent } from "sap/ui/table/Table";
 import Table from "sap/ui/table/Table";
-import UIComponent from "sap/ui/core/UIComponent";
 import BaseController from "./BaseController.controller";
 import NavContainer from "sap/m/NavContainer";
-import Control from "sap/ui/core/Control";
-import SapEvent from "sap/ui/base/Event";
-import dataTableUtils from "sap/ui/test/gherkin/dataTableUtils";
 
 interface RowClickHandler {
   domRef: HTMLElement;
@@ -103,13 +97,12 @@ export default class View extends BaseController {
   }
 
   private handleRowClick(cryptoId: string) {
-    const oRouter = UIComponent.getRouterFor(this);
+    const oRouter = this.getRouter();
     oRouter.navTo("CryptoDetail", { cryptoId });
   }
 
   public handlePageNav() {
-    const oNavContainer = this.byId("NavContainer") as NavContainer;
-    oNavContainer.back();
+    this.getRouter().navTo
   }
 
   private startPolling() {
