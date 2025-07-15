@@ -21,6 +21,14 @@ export default class Component extends BaseComponent {
     this.setModel( createCryptoModel(), "cryptoModel")
 
     // enable routing
-    this.getRouter().initialize();
+    const rootControl = this.getRootControl();
+
+    if (rootControl instanceof Promise) {
+      rootControl.then(() => {
+        this.getRouter().initialize();
+      });
+    } else {
+      this.getRouter().initialize();
+    }
   }
 }

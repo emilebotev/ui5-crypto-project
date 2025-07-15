@@ -4,12 +4,11 @@
     xmlns="sap.m"
     xmlns:u="sap.ui.unified"
     xmlns:core="sap.ui.core"
-    height="100%"
     id="View"
+    height="100%"
 >
     <Page
-        id="Mainpage"
-        class="sapUiContentPadding sapUiMediumPadding"
+        id="MainPage"
         showNavButton="true"
         showHeader="true"
         title="{i18n>appTitle}"
@@ -22,53 +21,46 @@
                     <Button
                         id="NavHome"
                         text="Home"
+                        press="handleNav"
                     />
                     <Button
                         id="NavNews"
                         text="News"
+                        press="handleNav"
                     />
                 </contentLeft>
                 <contentMiddle>
                     <core:Fragment
+                        id="SearchInputFragment"
                         fragmentName="sap.ui5.crypto.fragment.SearchInput"
                         type="XML"
                     />
                 </contentMiddle>
                 <contentRight>
                     <core:Fragment
+                        id="CurrencyPickerFragment"
                         fragmentName="sap.ui5.crypto.fragment.CurrencyPicker"
                         type="XML"
                     />
                 </contentRight>
             </Bar>
         </subHeader>
-
-            <Page
-                id="TopMarketCapPage"
-                class="sapUiContentPadding sapUiMediumPadding"
-                showHeader="false"
-                showSubHeader="true"
-            >
-                <content>
-                    <core:Fragment
-                        fragmentName="sap.ui5.crypto.fragment.Table"
-                        type="XML"
-                    />
-                </content>
-                <footer>
-                    <OverflowToolbar id="OverFlowToolbarFooterTMC">
-                        <Button
-                            id="LoadPreviousButton"
-                            text="Load Previous page"
-                            press=".onLoadPreviousPage"
-                        />
-                        <Button
-                            id="LoadMoreButton"
-                            text="Load Next page"
-                            press=".onLoadNextPage"
-                        />
-                    </OverflowToolbar>
-                </footer>
-            </Page>
+        <content>
+            <NavContainer id="routerTarget" />
+        </content>
+        <footer>
+            <OverflowToolbar id="OverFlowToolbarFooterTMC">
+                <Button
+                    id="LoadPreviousButton"
+                    text="Load Previous page"
+                    press=".onLoadPreviousPage"
+                />
+                <Button
+                    id="LoadMoreButton"
+                    text="Load Next page"
+                    press=".onLoadNextPage"
+                />
+            </OverflowToolbar>
+        </footer>
     </Page>
 </mvc:View>

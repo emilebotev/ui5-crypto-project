@@ -63,10 +63,9 @@
     "routing": {
       "config": {
         "routerClass": "sap.m.routing.Router",
+        "controlId": "routerTarget",
         "controlAggregation": "pages",
-        "controlId": "app",
         "transition": "slide",
-        "type": "View",
         "viewType": "XML",
         "path": "sap.ui5.crypto.view",
         "async": true
@@ -74,8 +73,8 @@
       "routes": [
         {
           "pattern": "",
-          "name": "View",
-          "target": "View"
+          "name": "TopMarketCap",
+          "target": "TopMarketCap"
         },
         {
           "pattern": "crypto/{cryptoId}",
@@ -84,9 +83,9 @@
         }
       ],
       "targets": {
-        "View": {
-          "viewId": "View",
-          "viewName": "View",
+        "TopMarketCap": {
+          "viewId": "TopMarketCap",
+          "viewName": "TopMarketCap",
           "viewLevel": 1
         },
         "CryptoDetail": {
@@ -97,9 +96,9 @@
       }
     },
     "rootView": {
-      "viewName": "sap.ui5.crypto.view.App",
+      "viewName": "sap.ui5.crypto.view.View",
       "type": "XML",
-      "id": "App",
+      "id": "View",
       "async": true
     }
   }

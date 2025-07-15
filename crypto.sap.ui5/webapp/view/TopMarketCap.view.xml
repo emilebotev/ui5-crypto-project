@@ -1,0 +1,161 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:t="sap.ui.table"
+    xmlns:rm="sap.ui.table.rowmodes"
+    xmlns:u="sap.ui.unified"
+    xmlns:core="sap.ui.core"
+    controllerName="sap.ui5.crypto.controller.TopMarketCap"
+    height="100%"
+>
+    <VBox
+        class="sapUiSmallMargin"
+        id="TopMarketCap"
+        height="100%"
+    >
+        <t:Table
+            id="cryptoTable"
+            rows="{cryptoModel>/crypto}"
+            selectionMode="None"
+            enableBusyIndicator="true"
+            rowMode="Auto"
+        >
+            <t:layoutData>
+                <FlexItemData
+                    id="tableFlexData"
+                    growFactor="1"
+                    baseSize="0%"
+                />
+            </t:layoutData>
+            <t:columns>
+                <t:Column
+                    id="MarketCapRank"
+                    sortProperty="market_cap_rank"
+                    showSortMenuEntry="true"
+                    width="4rem"
+                >
+                    <Text
+                        text="MC #"
+                        id="MCTextColumn"
+                    />
+                    <t:template>
+                        <Link
+                            text="{cryptoModel>market_cap_rank}"
+                            id="MCTextColumnTemplate"
+                            class="text-decoration-none"
+                        />
+                    </t:template>
+                </t:Column>
+
+                <t:Column
+                    id="NameColumn"
+                    sortProperty="name"
+                    filterProperty="name"
+                    showFilterMenuEntry="true"
+                    showSortMenuEntry="true"
+                >
+                    <Text
+                        text="Name"
+                        id="TextNameColumn"
+                    />
+                    <t:template>
+                        <HBox
+                            id="TextNameHBOXInTemplate"
+                            alignContent="Center"
+                            alignItems="Center"
+                            columnGap="7px"
+                        >
+                            <Image
+                                id="CryptoModelImageInTemplate"
+                                src="{cryptoModel>image}"
+                                width="17px"
+                                height="17px"
+                            />
+                            <Link
+                                text="{cryptoModel>name}"
+                                id="CryptoModelNameInTableText"
+                                class="text-decoration-none"
+                            />
+                        </HBox>
+                    </t:template>
+                </t:Column>
+
+                <t:Column
+                    id="PriceColumn"
+                    hAlign="End"
+                    sortProperty="current_price"
+                    showSortMenuEntry="true"
+                >
+                    <Text
+                        text="Price (USD)"
+                        id="PriceTextInTable"
+                    />
+                    <t:template>
+                        <ObjectNumber
+                            id="PriceONInTable"
+                            number="{
+                                parts: [
+                                    { path: 'cryptoModel>current_price' },
+                                    { path: 'cryptoModel>/selectedCurrency' }
+                                ],
+                                formatter: '.formatter.formatCurrency'
+                            }"
+                            textAlign="End"
+                        />
+                    </t:template>
+                </t:Column>
+
+                <t:Column
+                    id="PercentChangeColumn"
+                    hAlign="End"
+                    sortProperty="price_change_percentage_24h"
+                    showSortMenuEntry="true"
+                >
+                    <Text
+                        text="24h Change %"
+                        id="24hChangeText"
+                    />
+                    <t:template>
+                        <ObjectNumber
+                            id="24hChangeTextObjectNumber"
+                            number="{
+                                parts: [
+                                    { path: 'cryptoModel>price_change_percentage_24h' },
+                                    { path: 'cryptoModel>/selectedCurrency' }
+                                ],
+                                formatter: '.formatter.formatPercentage'
+                            }"
+                            state="{= ${cryptoModel>price_change_percentage_24h} >= 0 ? 'Success' : 'Error' }"
+                            textAlign="End"
+                        />
+                    </t:template>
+                </t:Column>
+
+                <t:Column
+                    id="MarketCapColumn"
+                    hAlign="End"
+                    sortProperty="market_cap"
+                    showSortMenuEntry="true"
+                >
+                    <Text
+                        text="Market Cap"
+                        id="MarketCapText"
+                    />
+                    <t:template>
+                        <ObjectNumber
+                            id="ObjectNumberMarketCapTable"
+                            number="{
+                                parts: [
+                                    { path: 'cryptoModel>market_cap' },
+                                    { path: 'cryptoModel>/selectedCurrency' }
+                                ],
+                                formatter: '.formatter.formatCurrency'
+                            }"
+                            textAlign="End"
+                        />
+                    </t:template>
+                </t:Column>
+            </t:columns>
+        </t:Table>
+    </VBox>
+</mvc:View>

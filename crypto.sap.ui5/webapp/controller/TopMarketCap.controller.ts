@@ -2,16 +2,14 @@ import {
   SearchField$SearchEvent,
   SearchField$SuggestEvent,
 } from "sap/m/SearchField";
-import { Select$ChangeEvent } from "sap/m/Select";
 import Filter from "sap/ui/model/Filter";
 import JSONListBinding from "sap/ui/model/json/JSONListBinding";
 
 import FilterOperator from "sap/ui/model/FilterOperator";
 import CryptoModel from "../model/cryptoModel";
 import Formatter from "../utils/Formatter";
+import Table from "sap/ui/table/Table";
 import BaseController from "./BaseController.controller";
-import { Button$ClickEvent } from "sap/ui/webc/main/Button";
-import NavContainer from "sap/m/NavContainer";
 
 interface RowClickHandler {
   domRef: HTMLElement;
@@ -19,12 +17,13 @@ interface RowClickHandler {
 }
 
 /**
- * @namespace sap.ui5.crypto.controller.View
+ * @namespace sap.ui5.crypto.controller.TopMarketCap
  */
-export default class View extends BaseController {
+export default class TopMarketCap extends BaseController {
   private cryptoModel: CryptoModel;
   private oResizeObserver: ResizeObserver;
   formatter = Formatter;
+  private pollIntervalId: number | undefined;
   private rowClickHandlers: RowClickHandler[] = [];
 
   onBeforeRendering(): void {
@@ -42,28 +41,83 @@ export default class View extends BaseController {
       return;
     }
     this.cryptoModel = cryptoModel;
-    // Load the available vs_currencies from the API
-    this.cryptoModel.loadSupportedCurrencies();
+    cryptoModel
+      .bindProperty("/selectedCurrency")
+      .attachChange(this.onCurrencyChange, this);
+
+    // Load the top 20 cryptocurrencies from the API
+    this.cryptoModel.getTopMarketCap();
+
+
+    //Start polling if not already started
+    this.startPolling();
   }
 
-  public handlePageNav() {
-    const navContainer = this.byId("routerTarget") as NavContainer;
-    navContainer.back();
+  onAfterRendering() {
+    // Get reference to the Crypto table
+    const oTable = this.byId("cryptoTable") as Table;
+
+    if (!oTable) {
+      console.error("Table was not found by id", oTable);
+      return;
+    }
+
+    // Attach event for rows updated
+    oTable.attachEvent("rowsUpdated", () => {
+      const aRows = oTable.getRows();
+
+      aRows.forEach((row) => {
+        const rowDomRef = row.getDomRef() as HTMLElement | null;
+        if (!rowDomRef) {
+          console.error("Dom ref is not found", rowDomRef);
+          return;
+        }
+        // Change the cursor, so the items would look clickable
+        rowDomRef.style.cursor = "pointer";
+        const oContext = row.getBindingContext("cryptoModel");
+        const sId = oContext?.getProperty("symbol");
+
+        const handler = () => this.handleRowClick(sId);
+
+        // Attach click event listener to each row
+
+        rowDomRef.addEventListener("click", handler);
+
+        // Save reference to each and every domref and its click handler to be able to remove onExit
+        this.rowClickHandlers.push({
+          domRef: rowDomRef as HTMLElement,
+          handler,
+        });
+      });
+    });
+  }
+
+  private handleRowClick(cryptoId: string) {
     const oRouter = this.getRouter();
-    oRouter.navTo("RouteView", {}, true);
+    oRouter.navTo("CryptoDetail", { cryptoId });
   }
 
-  handleNav(e: Button$ClickEvent) {
-    const targetText = e.getSource().getText();
-    console.log(targetText);
-    if (targetText === "Home") {
-      this.getRouter().navTo("TopMarketCap");
+  private startPolling() {
+    if (this.pollIntervalId) {
+      return;
+    }
+
+    this.pollIntervalId = window.setInterval(() => {
+      this.cryptoModel.getTopMarketCap();
+    }, 60 * 1000);
+    console.info("Started polling getTopMarketCap every 60s");
+  }
+
+  private stopPolling(): void {
+    if (this.pollIntervalId) {
+      window.clearInterval(this.pollIntervalId);
+      this.pollIntervalId = undefined;
+      console.info("Stopped polling getTopMarketCap");
     }
   }
 
-  onCurrencyChange(oEvent: Select$ChangeEvent) {
-    const newCurrency = oEvent.getParameter("selectedItem")?.getKey();
-    this.cryptoModel.changeSelectedCurrency(newCurrency as string);
+  onCurrencyChange() {
+    this.cryptoModel.getTopMarketCap();
   }
 
   onLoadNextPage() {
@@ -107,7 +161,7 @@ export default class View extends BaseController {
 
   onExit(): void | undefined {
     this.oResizeObserver.disconnect();
-    // this.stopPolling();
+    this.stopPolling();
     this.clearRowClickHandlers();
   }
 }
