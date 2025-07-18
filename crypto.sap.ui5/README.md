@@ -39,13 +39,26 @@ A SAP Fiori application for training purposes dedicated to Crypro currencies pri
    - Create a Developer's account
    - Under your account create an API key
 
-3. From your SAP BTP Cockpit go to Destinations and fill in the form as follows:
+3. Instructions for API key :
 
-   ![form-screenshot-1](image.png)
+   - Deployment Scenario
+      From your SAP BTP Cockpit go to Destinations and fill in the form as follows:
 
-   Set the Additional properties as follows:
+      ![form-screenshot-1](image.png)
 
-   ![form-screenshot-2](image-1.png)
+      Set the Additional properties as follows:
 
-   As value of the key `URL.headers.x-cg-demo-api-key` put your API key from Coin Gecko Dev Dashboard
-   ![api-key-coin-gecko-screenshot](image-2.png)
+      ![form-screenshot-2](image-1.png)
+
+      As value of the key `URL.headers.x-cg-demo-api-key` put your API key from Coin Gecko Dev Dashboard
+      ![api-key-coin-gecko-screenshot](image-2.png)
+
+      Deploy the app
+
+   - Development Scenario
+      In the ```crypto.sap.ui5``` project in `utils` folder create a file and name it `local-dev-credentials.ts`
+      Include the following code in it:
+      ```ts
+      export const CG_API_KEY = '<your-coin-gecko-api-key>';
+      ```
+
