@@ -9,6 +9,8 @@ export default class CryptoModel extends JSONModel {
   private API_BASE_URL_LOCAL = "https://api.coingecko.com/api/v3/";
   private COINS_PATH = "coins/markets";
   private SUPPORTED_CURRENCIES_PATH = "simple/supported_vs_currencies";
+  private createCoinByIdPath = (id: string) => `coins/${id}/market_chart`;
+
   private headers = {
     accept: "application/json",
   };
@@ -16,7 +18,7 @@ export default class CryptoModel extends JSONModel {
   private page = 1;
 
   constructor() {
-    super({ selectedCurrency: "usd" });
+    super({ selectedCurrency: "usd", selectedDays: 1 });
   }
 
   private getBaseUrl() {
@@ -36,7 +38,6 @@ export default class CryptoModel extends JSONModel {
     }
     return this.headers;
   }
-
 
   private incrementPage() {
     this.page = this.page + 1;
@@ -122,5 +123,55 @@ export default class CryptoModel extends JSONModel {
 
   public changeSelectedCurrency(currency: string) {
     this.setProperty("/selectedCurrency", currency);
+  }
+
+  public getCoinHistoryById(id: string) {
+    const url = `${this.getBaseUrl()}/${this.createCoinByIdPath(id)}`;
+    const vs_currency = this.getProperty("/selectedCurrency");
+    const days = this.getProperty("/selectedDays");
+
+    const oParameters = {
+      vs_currency,
+      days,
+    };
+
+    const rawDataModel = new JSONModel();
+    rawDataModel.loadData(
+      url,
+      oParameters,
+      true,
+      "GET",
+      false,
+      true,
+      this.getHeaders()
+    );
+
+    rawDataModel.attachRequestCompleted((oEvent) => {
+      if (!oEvent.getParameter("success")) {
+        return;
+      }
+      const { prices, market_caps, total_volumes } = rawDataModel.getData();
+      const processedData = prices.map(
+        (priceEntry: [number, number], index: number) => {
+          const [timeStampRaw, price] = priceEntry;
+          const date = new Date(timeStampRaw);
+          return {
+            date,
+            price,
+            marketCap: parseFloat(market_caps[index][1].toFixed(2)),
+            volume: parseFloat(total_volumes[index][1].toFixed(2)),
+          };
+        }
+      );
+      this.setProperty("/cryptoDetail", processedData);
+    });
+  }
+
+  changeSelectedDays(days: string | undefined) {
+    if (!days) {
+      console.error("Days argument is not valid!", days);
+      return;
+    }
+    this.setProperty("/selectedDays", days);
   }
 }

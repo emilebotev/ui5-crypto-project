@@ -48,7 +48,6 @@ export default class TopMarketCap extends BaseController {
     // Load the top 20 cryptocurrencies from the API
     this.cryptoModel.getTopMarketCap();
 
-
     //Start polling if not already started
     this.startPolling();
   }
@@ -67,6 +66,11 @@ export default class TopMarketCap extends BaseController {
       const aRows = oTable.getRows();
 
       aRows.forEach((row) => {
+        const oContext = row.getBindingContext("cryptoModel");
+        const sId = oContext?.getProperty("id");
+        if (!sId) {
+          return;
+        }
         const rowDomRef = row.getDomRef() as HTMLElement | null;
         if (!rowDomRef) {
           console.error("Dom ref is not found", rowDomRef);
@@ -74,10 +78,8 @@ export default class TopMarketCap extends BaseController {
         }
         // Change the cursor, so the items would look clickable
         rowDomRef.style.cursor = "pointer";
-        const oContext = row.getBindingContext("cryptoModel");
-        const sId = oContext?.getProperty("symbol");
 
-        const handler = () => this.handleRowClick(sId);
+        const handler = (e: Event) => this.handleRowClick(e, sId);
 
         // Attach click event listener to each row
 
@@ -92,8 +94,13 @@ export default class TopMarketCap extends BaseController {
     });
   }
 
-  private handleRowClick(cryptoId: string) {
+  private handleRowClick(e: Event, cryptoId: string) {
+    e.preventDefault();
+    if (!cryptoId) {
+      return;
+    }
     const oRouter = this.getRouter();
+    console.log("in handler", cryptoId);
     oRouter.navTo("CryptoDetail", { cryptoId });
   }
 

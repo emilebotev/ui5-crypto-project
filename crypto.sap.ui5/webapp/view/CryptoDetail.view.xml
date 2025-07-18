@@ -2,10 +2,106 @@
     controllerName="sap.ui5.crypto.controller.CryptoDetail"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
-    xmlns:u="sap.ui.unified"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
     xmlns:core="sap.ui.core"
-    height="100%"
-    id="CryptoDetail"
 >
-    <Text id="CryptoDetailText" text="CryptoDetail"></Text>
+    <Page
+        id="CryptoDetailPage"
+        title="Crypto Chart"
+    >
+        <content>
+            <VBox
+                id="CryptoDetailVBox"
+                class="sapUiSmallMargin"
+            >
+            <!-- TODO Set dynamic vizType after creating a dedicated CryptoDetail Model to hold this property -->
+                <viz:VizFrame
+                    id="cryptoDetailVizFrame"
+                    width="100%"
+                    height="500px"
+                    uiConfig="{applicationSet: 'fiori'}"
+                    vizType="timeseries_line"
+                    vizProperties="{title: { text: 'Price Over Time' }}"
+                >
+                    <viz:dataset>
+                        <viz.data:FlattenedDataset
+                            id="cryptoDetailDataset"
+                            data="{/cryptoDetail}"
+                        >
+                            <viz.data:dimensions>
+                                <viz.data:DimensionDefinition
+                                    id="cryptoDetailDimensionDate"
+                                    name="Date"
+                                    value="{date}"
+                                    dataType="date"
+                                />
+                            </viz.data:dimensions>
+                            <viz.data:measures>
+                                <viz.data:MeasureDefinition
+                                    id="cryptoDetailMeasurePrice"
+                                    name="Price"
+                                    value="{price}"
+                                />
+                            </viz.data:measures>
+                        </viz.data:FlattenedDataset>
+                    </viz:dataset>
+                    <viz:feeds>
+                        <viz.feeds:FeedItem
+                            id="cryptoDetailFeedTimeAxis"
+                            uid="timeAxis"
+                            type="Dimension"
+                            values="Date"
+                        />
+                        <viz.feeds:FeedItem
+                            id="cryptoDetailFeedValueAxis"
+                            uid="valueAxis"
+                            type="Measure"
+                            values="Price"
+                        />
+                    </viz:feeds>
+                </viz:VizFrame>
+
+                <HBox
+                    id="CryptoDetailHBox"
+                    justifyContent="Start"
+                >
+                    <SegmentedButton
+                        id="daysSelectionSegmentedButton"
+                        selectedKey="{/selectedDays}"
+                        selectionChange="onDaysChange"
+                    >
+                        <items>
+                            <SegmentedButtonItem
+                                id="daysSelectionSegmentedButtonItem1"
+                                key="1"
+                                text="1D"
+                            />
+                            <SegmentedButtonItem
+                                id="daysSelectionSegmentedButtonItem2"
+                                key="7"
+                                text="7D"
+                            />
+                            <SegmentedButtonItem
+                                id="daysSelectionSegmentedButtonItem3"
+                                key="30"
+                                text="1M"
+                            />
+                            <SegmentedButtonItem
+                                id="daysSelectionSegmentedButtonItem4"
+                                key="180"
+                                text="6M"
+                            />
+                            <SegmentedButtonItem
+                                id="daysSelectionSegmentedButtonItem5"
+                                key="365"
+                                text="1Y"
+                            />
+                        </items>
+                    </SegmentedButton>
+                </HBox>
+            </VBox>
+        </content>
+    </Page>
 </mvc:View>
