@@ -4,15 +4,16 @@
     xmlns="sap.m"
     xmlns:u="sap.ui.unified"
     xmlns:core="sap.ui.core"
+    id="View"
     height="100%"
 >
     <Page
-        id="page"
-        class="sapUiContentPadding sapUiMediumPadding"
+        id="MainPage"
         showNavButton="true"
         showHeader="true"
         title="{i18n>appTitle}"
         showSubHeader="true"
+        navButtonPress=".handlePageNav"
     >
         <subHeader>
             <Bar id="NavItemsBar">
@@ -20,34 +21,32 @@
                     <Button
                         id="NavHome"
                         text="Home"
+                        press="handleNav"
                     />
                     <Button
                         id="NavNews"
                         text="News"
+                        press="handleNav"
                     />
                 </contentLeft>
                 <contentMiddle>
-                    <mvc:XMLView
-                        viewName="sap.ui5.crypto.view.SearchInput"
-                        id="headerView"
+                    <core:Fragment
+                        id="SearchInputFragment"
+                        fragmentName="sap.ui5.crypto.fragment.SearchInput"
+                        type="XML"
                     />
                 </contentMiddle>
                 <contentRight>
-                    <mvc:XMLView
-                        viewName="sap.ui5.crypto.view.CurrencyPicker"
-                        id="CurrencySelect"
+                    <core:Fragment
+                        id="CurrencyPickerFragment"
+                        fragmentName="sap.ui5.crypto.fragment.CurrencyPicker"
+                        type="XML"
                     />
                 </contentRight>
             </Bar>
         </subHeader>
-
         <content>
-            <NavContainer id="NavContainer">
-                <mvc:XMLView
-                    viewName="sap.ui5.crypto.view.Table"
-                    id="tableView"
-                />
-            </NavContainer>
+            <NavContainer id="routerTarget" />
         </content>
         <footer>
             <OverflowToolbar id="OverFlowToolbarFooterTMC">

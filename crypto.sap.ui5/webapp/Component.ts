@@ -1,5 +1,5 @@
 import BaseComponent from "sap/ui/core/UIComponent";
-import { createDeviceModel } from "./model/models";
+import { createCryptoModel, createDeviceModel } from "./model/models";
 
 /**
  * @namespace sap.ui5.crypto.Component
@@ -16,7 +16,19 @@ export default class Component extends BaseComponent {
 
     // set the device model
     this.setModel(createDeviceModel(), "device");
+
+    // set the shared crypto model
+    this.setModel( createCryptoModel(), "cryptoModel")
+
     // enable routing
-    this.getRouter().initialize();
+    const rootControl = this.getRootControl();
+
+    if (rootControl instanceof Promise) {
+      rootControl.then(() => {
+        this.getRouter().initialize();
+      });
+    } else {
+      this.getRouter().initialize();
+    }
   }
 }

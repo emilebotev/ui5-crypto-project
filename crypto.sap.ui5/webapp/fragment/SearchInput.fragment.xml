@@ -1,0 +1,52 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout">
+
+    <HeaderContainer id="headercontainer">
+        <l:HorizontalLayout id="SearchHorizontalLayout">
+            <Label
+                text="Search"
+                labelFor="SearchInput"
+                class="sapUiSmallMargin"
+                id="SearchLabel"
+            />
+            <Input
+                id="SearchInput"
+                width="200px"
+                showSuggestion="true"
+                placeholder="Search by name or symbol..."
+                suggest=".onSuggest"
+                suggestionRows="{
+                     path: 'cryptoModel>/crypto'
+                }"
+                value="{cryptoModel>/searchValue}"
+            >
+                <suggestionColumns>
+                    <Column width="30px" id="suggestionColumn1"/>
+                    <Column  id="suggestionColumn2">
+                        <Text text="Name"  id="textColumn1" />
+                    </Column>
+                    <Column  id="suggestionColumn3">
+                        <Text text="Symbol" id="textColumn3" />
+                    </Column>
+                </suggestionColumns>
+
+                <suggestionRows>
+                    <ColumnListItem id="columnListItemInSuggestions">
+                        <cells>
+                            <Image
+                                src="{cryptoModel>image}"
+                                width="15px"
+                                height="15px"
+                                id="CryptoModelImageLogo"
+                            />
+                            <Text text="{cryptoModel>name}"  id="CryptoModelNameText" />
+                            <Text text="{cryptoModel>symbol}"  id="CryptoModelSymbol"/>
+                        </cells>
+                    </ColumnListItem>
+                </suggestionRows>
+            </Input>
+        </l:HorizontalLayout>
+    </HeaderContainer>
+</core:FragmentDefinition>
