@@ -1,0 +1,9 @@
+
+applications:
+  - name: ui5-approuter
+    path: .
+    memory: 128M
+    buildpacks:
+      - nodejs_buildpack
+    env:
+      destinations: '[{"name":"CoinGeckoAPIKey","url":"https://api.coingecko.com/api/v3/","forwardAuthToken":false}]'

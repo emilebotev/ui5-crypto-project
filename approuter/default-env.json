@@ -1,0 +1,9 @@
+{
+  "destinations": [
+    {
+      "name": "CoinGeckoAPIKey",
+      "url": "https://api.coingecko.com/api/v3/",
+      "forwardAuthToken": false
+    }
+  ]
+}
