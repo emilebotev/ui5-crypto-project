@@ -15,7 +15,7 @@
     >
         <t:Table
             id="cryptoTable"
-            rows="{cryptoModel>/crypto}"
+            rows="{topMarketCap>/crypto}"
             selectionMode="None"
             enableBusyIndicator="true"
             rowMode="Auto"
@@ -40,7 +40,7 @@
                     />
                     <t:template>
                         <Link
-                            text="{cryptoModel>market_cap_rank}"
+                            text="{topMarketCap>market_cap_rank}"
                             id="MCTextColumnTemplate"
                             class="text-decoration-none"
                         />
@@ -66,14 +66,14 @@
                             columnGap="7px"
                         >
                             <Image
-                                id="CryptoModelImageInTemplate"
-                                src="{cryptoModel>image}"
+                                id="topMarketCapImageInTemplate"
+                                src="{topMarketCap>image}"
                                 width="17px"
                                 height="17px"
                             />
                             <Link
-                                text="{cryptoModel>name}"
-                                id="CryptoModelNameInTableText"
+                                text="{topMarketCap>name}"
+                                id="topMarketCapNameInTableText"
                                 class="text-decoration-none"
                             />
                         </HBox>
@@ -95,8 +95,8 @@
                             id="PriceONInTable"
                             number="{
                                 parts: [
-                                    { path: 'cryptoModel>current_price' },
-                                    { path: 'cryptoModel>/selectedCurrency' }
+                                    { path: 'topMarketCap>current_price' },
+                                    { path: 'topMarketCap>/selectedCurrency' }
                                 ],
                                 formatter: '.formatter.formatCurrency'
                             }"
@@ -120,12 +120,12 @@
                             id="24hChangeTextObjectNumber"
                             number="{
                                 parts: [
-                                    { path: 'cryptoModel>price_change_percentage_24h' },
-                                    { path: 'cryptoModel>/selectedCurrency' }
+                                    { path: 'topMarketCap>price_change_percentage_24h' },
+                                    { path: 'topMarketCap>/selectedCurrency' }
                                 ],
                                 formatter: '.formatter.formatPercentage'
                             }"
-                            state="{= ${cryptoModel>price_change_percentage_24h} >= 0 ? 'Success' : 'Error' }"
+                            state="{= ${topMarketCap>price_change_percentage_24h} >= 0 ? 'Success' : 'Error' }"
                             textAlign="End"
                         />
                     </t:template>
@@ -146,8 +146,8 @@
                             id="ObjectNumberMarketCapTable"
                             number="{
                                 parts: [
-                                    { path: 'cryptoModel>market_cap' },
-                                    { path: 'cryptoModel>/selectedCurrency' }
+                                    { path: 'topMarketCap>market_cap' },
+                                    { path: 'topMarketCap>/selectedCurrency' }
                                 ],
                                 formatter: '.formatter.formatCurrency'
                             }"

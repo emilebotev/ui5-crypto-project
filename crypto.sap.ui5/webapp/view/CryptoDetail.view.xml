@@ -16,7 +16,7 @@
                 id="CryptoDetailVBox"
                 class="sapUiSmallMargin"
             >
-            <!-- TODO Set dynamic vizType after creating a dedicated CryptoDetail Model to hold this property -->
+                <!-- TODO Set dynamic vizType after creating a dedicated CryptoDetail Model to hold this property -->
                 <viz:VizFrame
                     id="cryptoDetailVizFrame"
                     width="100%"
@@ -24,11 +24,12 @@
                     uiConfig="{applicationSet: 'fiori'}"
                     vizType="timeseries_line"
                     vizProperties="{title: { text: 'Price Over Time' }}"
+                    renderComplete=".onRenderComplete"
                 >
                     <viz:dataset>
                         <viz.data:FlattenedDataset
                             id="cryptoDetailDataset"
-                            data="{/cryptoDetail}"
+                            data="{cryptoDetail>/cryptoDetail}"
                         >
                             <viz.data:dimensions>
                                 <viz.data:DimensionDefinition
@@ -43,6 +44,7 @@
                                     id="cryptoDetailMeasurePrice"
                                     name="Price"
                                     value="{price}"
+                                    format="usd"
                                 />
                             </viz.data:measures>
                         </viz.data:FlattenedDataset>
@@ -69,8 +71,8 @@
                 >
                     <SegmentedButton
                         id="daysSelectionSegmentedButton"
-                        selectedKey="{/selectedDays}"
-                        selectionChange="onDaysChange"
+                        selectedKey="{cryptoDetail>/selectedDays}"
+                        selectionChange=".onSelectedDaysChange"
                     >
                         <items>
                             <SegmentedButtonItem

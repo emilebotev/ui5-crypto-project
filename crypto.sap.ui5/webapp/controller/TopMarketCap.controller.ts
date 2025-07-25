@@ -10,6 +10,13 @@ import CryptoModel from "../model/cryptoModel";
 import Formatter from "../utils/Formatter";
 import Table from "sap/ui/table/Table";
 import BaseController from "./BaseController.controller";
+import {
+  CryptoModelPropsDictionary,
+  ModelNamesDictionary,
+} from "../types/Dictionaries";
+import { Router$RouteMatchedEvent } from "sap/ui/core/routing/Router";
+import TopMarketCapModel from "../model/topMarketCapModel";
+import { createTopMarketCapModel } from "../model/models";
 
 interface RowClickHandler {
   domRef: HTMLElement;
@@ -20,14 +27,14 @@ interface RowClickHandler {
  * @namespace sap.ui5.crypto.controller.TopMarketCap
  */
 export default class TopMarketCap extends BaseController {
-  private cryptoModel: CryptoModel;
-  private oResizeObserver: ResizeObserver;
+  private topMarketCapModel: TopMarketCapModel;
   formatter = Formatter;
   private pollIntervalId: number | undefined;
   private rowClickHandlers: RowClickHandler[] = [];
+  private readonly routerName = "TopMarketCap";
 
-  onBeforeRendering(): void {
-    // Get the already initialized CryptoModel
+  onInit(): void | undefined {
+    this.getRouter().attachRouteMatched(this.onAnyRouteMatched, this);
     const view = this.getView();
 
     if (!view) {
@@ -35,25 +42,31 @@ export default class TopMarketCap extends BaseController {
       return;
     }
 
-    const cryptoModel = this.getTypedModel<CryptoModel>("cryptoModel");
+    const cryptoModel = this.getOwnerComponent()?.getModel(
+      ModelNamesDictionary.cryptoModel
+    );
+
     if (!cryptoModel) {
       console.error("Crypto Model is not defined", cryptoModel);
       return;
     }
-    this.cryptoModel = cryptoModel;
-    cryptoModel
-      .bindProperty("/selectedCurrency")
-      .attachChange(this.onCurrencyChange, this);
-
+    this.topMarketCapModel = createTopMarketCapModel(
+      cryptoModel as CryptoModel
+    );
     // Load the top 20 cryptocurrencies from the API
-    this.cryptoModel.getTopMarketCap();
+    this.topMarketCapModel.getTopMarketCap();
+
+    view.setModel(this.topMarketCapModel, ModelNamesDictionary.topMarketCap);
+    cryptoModel
+      .bindProperty(CryptoModelPropsDictionary.selectedCurrency)
+      .attachChange(this.onCurrencyChange, this);
 
     //Start polling if not already started
     this.startPolling();
   }
 
-  onAfterRendering() {
-    // Get reference to the Crypto table
+  onBeforeRendering(): void {
+    // Get the already initialized CryptoModel
     const oTable = this.byId("cryptoTable") as Table;
 
     if (!oTable) {
@@ -63,35 +76,57 @@ export default class TopMarketCap extends BaseController {
 
     // Attach event for rows updated
     oTable.attachEvent("rowsUpdated", () => {
-      const aRows = oTable.getRows();
+      this.attachRowClickHandlers();
+    });
+  }
 
-      aRows.forEach((row) => {
-        const oContext = row.getBindingContext("cryptoModel");
-        const sId = oContext?.getProperty("id");
-        if (!sId) {
-          return;
-        }
-        const rowDomRef = row.getDomRef() as HTMLElement | null;
-        if (!rowDomRef) {
-          console.error("Dom ref is not found", rowDomRef);
-          return;
-        }
-        // Change the cursor, so the items would look clickable
-        rowDomRef.style.cursor = "pointer";
+  private attachRowClickHandlers() {
+    const oTable = this.byId("cryptoTable") as Table;
 
-        const handler = (e: Event) => this.handleRowClick(e, sId);
+    if (!oTable) {
+      console.error("Table was not found by id", oTable);
+      return;
+    }
 
-        // Attach click event listener to each row
+    const aRows = oTable.getRows();
 
-        rowDomRef.addEventListener("click", handler);
+    aRows.forEach((row) => {
+      const oContext = row.getBindingContext(ModelNamesDictionary.topMarketCap);
+      const sId = oContext?.getProperty("id");
+      if (!sId) {
+        return;
+      }
+      const rowDomRef = row.getDomRef() as HTMLElement | null;
+      if (!rowDomRef) {
+        console.error("Dom ref is not found", rowDomRef);
+        return;
+      }
+      // Change the cursor, so the items would look clickable
+      rowDomRef.style.cursor = "pointer";
 
-        // Save reference to each and every domref and its click handler to be able to remove onExit
-        this.rowClickHandlers.push({
-          domRef: rowDomRef as HTMLElement,
-          handler,
-        });
+      const handler = (e: Event) => this.handleRowClick(e, sId);
+
+      // Attach click event listener to each row
+
+      rowDomRef.addEventListener("click", handler);
+
+      // Save reference to each and every domref and its click handler to be able to remove onExit
+      this.rowClickHandlers.push({
+        domRef: rowDomRef as HTMLElement,
+        handler,
       });
     });
+  }
+
+  private onAnyRouteMatched(oEvent: Router$RouteMatchedEvent) {
+    const routeName = oEvent.getParameter("name");
+    if (routeName !== this.routerName) {
+      this.stopPolling();
+      this.clearRowClickHandlers();
+    } else {
+      this.startPolling();
+      this.attachRowClickHandlers();
+    }
   }
 
   private handleRowClick(e: Event, cryptoId: string) {
@@ -100,7 +135,6 @@ export default class TopMarketCap extends BaseController {
       return;
     }
     const oRouter = this.getRouter();
-    console.log("in handler", cryptoId);
     oRouter.navTo("CryptoDetail", { cryptoId });
   }
 
@@ -110,7 +144,7 @@ export default class TopMarketCap extends BaseController {
     }
 
     this.pollIntervalId = window.setInterval(() => {
-      this.cryptoModel.getTopMarketCap();
+      this.topMarketCapModel.getTopMarketCap();
     }, 60 * 1000);
     console.info("Started polling getTopMarketCap every 60s");
   }
@@ -124,14 +158,14 @@ export default class TopMarketCap extends BaseController {
   }
 
   onCurrencyChange() {
-    this.cryptoModel.getTopMarketCap();
+    this.topMarketCapModel.getTopMarketCap();
   }
 
   onLoadNextPage() {
-    this.cryptoModel.loadNextTopMarketCap();
+    this.topMarketCapModel.loadNextTopMarketCap();
   }
   onLoadPreviousPage() {
-    this.cryptoModel.loadPreviousTopMarketCap();
+    this.topMarketCapModel.loadPreviousTopMarketCap();
   }
 
   onSearch(oEvenet: SearchField$SearchEvent) {
@@ -167,7 +201,6 @@ export default class TopMarketCap extends BaseController {
   }
 
   onExit(): void | undefined {
-    this.oResizeObserver.disconnect();
     this.stopPolling();
     this.clearRowClickHandlers();
   }

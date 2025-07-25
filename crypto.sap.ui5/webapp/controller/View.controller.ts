@@ -23,9 +23,7 @@ interface RowClickHandler {
  */
 export default class View extends BaseController {
   private cryptoModel: CryptoModel;
-  private oResizeObserver: ResizeObserver;
   formatter = Formatter;
-  private rowClickHandlers: RowClickHandler[] = [];
 
   onBeforeRendering(): void {
     // Get the already initialized CryptoModel
@@ -50,12 +48,11 @@ export default class View extends BaseController {
     const navContainer = this.byId("routerTarget") as NavContainer;
     navContainer.back();
     const oRouter = this.getRouter();
-    oRouter.navTo("RouteView", {}, true);
+    oRouter.navTo("TopMarketCap", {}, true);
   }
 
   handleNav(e: Button$ClickEvent) {
     const targetText = e.getSource().getText();
-    console.log(targetText);
     if (targetText === "Home") {
       this.getRouter().navTo("TopMarketCap");
     }
@@ -66,20 +63,13 @@ export default class View extends BaseController {
     this.cryptoModel.changeSelectedCurrency(newCurrency as string);
   }
 
-  onLoadNextPage() {
-    this.cryptoModel.loadNextTopMarketCap();
-  }
-  onLoadPreviousPage() {
-    this.cryptoModel.loadPreviousTopMarketCap();
-  }
-
   onSearch(oEvenet: SearchField$SearchEvent) {
     const query = oEvenet.getParameters().query;
   }
 
-  onSuggest(oEvenet: SearchField$SuggestEvent) {
-    const sQuery = oEvenet.getParameter("suggestValue");
-    const searchfield = oEvenet.getSource();
+  onSuggest(oEvent: SearchField$SuggestEvent) {
+    const sQuery = oEvent.getParameter("suggestValue");
+    const searchfield = oEvent.getSource();
     const binding = searchfield.getBinding("suggestionItems");
     if (!binding) {
       return;
@@ -96,18 +86,5 @@ export default class View extends BaseController {
     });
     (binding as JSONListBinding).filter([filter]);
     searchfield.suggest();
-  }
-
-  private clearRowClickHandlers() {
-    this.rowClickHandlers.forEach(({ domRef, handler }) => {
-      domRef.removeEventListener("click", handler);
-    });
-    this.rowClickHandlers = [];
-  }
-
-  onExit(): void | undefined {
-    this.oResizeObserver.disconnect();
-    // this.stopPolling();
-    this.clearRowClickHandlers();
   }
 }
