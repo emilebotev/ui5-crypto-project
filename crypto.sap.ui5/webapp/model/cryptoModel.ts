@@ -3,6 +3,9 @@ import Log from "sap/base/Log";
 import { Model$RequestFailedEvent } from "sap/ui/model/Model";
 import { getEnvironment } from "../utils/getEnvironment";
 import { CG_API_KEY } from "./../utils/local-dev-credentials";
+import { CoinHistoryByIdData, CryptoCurrency } from "../types/Cryptocurrencies";
+import { CryptoModelPropsDictionary } from "../types/Dictionaries";
+
 export default class CryptoModel extends JSONModel {
   // Fixing the API Base URL to match the one streamlining to CoinGecko with needed Authntication, handled in destinations
   private API_BASE_URL = "/api/";
@@ -15,10 +18,8 @@ export default class CryptoModel extends JSONModel {
     accept: "application/json",
   };
 
-  private page = 1;
-
   constructor() {
-    super({ selectedCurrency: "usd", selectedDays: 1 });
+    super({ selectedCurrency: "usd" });
   }
 
   private getBaseUrl() {
@@ -39,65 +40,36 @@ export default class CryptoModel extends JSONModel {
     return this.headers;
   }
 
-  private incrementPage() {
-    this.page = this.page + 1;
-  }
-  private decrementPage() {
-    this.page = this.page - 1;
-  }
-
-  public getTopMarketCap(numberOfResults = 20) {
+  public async fetchTopMarketCap(page: number, per_page = 20) {
     const url = this.getBaseUrl() + this.COINS_PATH;
-    const vs_currency = this.getProperty("/selectedCurrency");
+    const vs_currency = this.getProperty(
+      CryptoModelPropsDictionary.selectedCurrency
+    );
     const oParameters = {
       vs_currency,
-      per_page: numberOfResults,
-      page: this.page,
+      per_page,
+      page,
     };
 
     const oTempModel = new JSONModel();
 
-    oTempModel.loadData(
-      url,
-      oParameters,
-      true,
-      "GET",
-      false,
-      false,
-      this.getHeaders()
-    );
-
-    oTempModel.attachRequestCompleted((oEvent) => {
-      if (oEvent.getParameter("success")) {
-        console.info(
-          `Page ${this.page} of top ${numberOfResults} cryptocurrencies was loaded succesfully`
-        );
-        this.setProperty("/crypto", oTempModel.getData());
-      } else {
-        Log.error(
-          `Failed to load page ${
-            this.page
-          } of top ${numberOfResults} cryptocurrencies. Status: ${(
-            oEvent as Model$RequestFailedEvent
-          ).getParameter("statusCode")}`
-        );
-      }
-    });
-
-    oTempModel.attachRequestFailed((oEvent) => {
-      const error = `Request failed: ${oEvent.getParameter("message")}`;
-      Log.error(error);
-    });
-  }
-
-  public loadNextTopMarketCap() {
-    this.incrementPage();
-    this.getTopMarketCap();
-  }
-
-  public loadPreviousTopMarketCap() {
-    this.decrementPage();
-    this.getTopMarketCap();
+    try {
+      await oTempModel.loadData(
+        url,
+        oParameters,
+        true,
+        "GET",
+        false,
+        false,
+        this.getHeaders()
+      );
+      return oTempModel.getData();
+    } catch (error) {
+      console.error(
+        "Something went wrong while fetching data for Top Market Cap",
+        error
+      );
+    }
   }
 
   public loadSupportedCurrencies() {
@@ -109,7 +81,7 @@ export default class CryptoModel extends JSONModel {
     oTempModel.attachRequestCompleted((oEvent) => {
       if (oEvent.getParameter("success")) {
         this.setProperty(
-          "/supportedCurrencies",
+          CryptoModelPropsDictionary.supportedCurrencies,
           oTempModel.getData().map((item: string) => ({ id: item, code: item }))
         );
       }
@@ -122,13 +94,14 @@ export default class CryptoModel extends JSONModel {
   }
 
   public changeSelectedCurrency(currency: string) {
-    this.setProperty("/selectedCurrency", currency);
+    this.setProperty(CryptoModelPropsDictionary.selectedCurrency, currency, );
   }
 
-  public getCoinHistoryById(id: string) {
+  public async fetchCoinHistoryById(id: string, days: string) {
     const url = `${this.getBaseUrl()}/${this.createCoinByIdPath(id)}`;
-    const vs_currency = this.getProperty("/selectedCurrency");
-    const days = this.getProperty("/selectedDays");
+    const vs_currency = this.getProperty(
+      CryptoModelPropsDictionary.selectedCurrency
+    );
 
     const oParameters = {
       vs_currency,
@@ -136,42 +109,22 @@ export default class CryptoModel extends JSONModel {
     };
 
     const rawDataModel = new JSONModel();
-    rawDataModel.loadData(
-      url,
-      oParameters,
-      true,
-      "GET",
-      false,
-      true,
-      this.getHeaders()
-    );
 
-    rawDataModel.attachRequestCompleted((oEvent) => {
-      if (!oEvent.getParameter("success")) {
-        return;
-      }
-      const { prices, market_caps, total_volumes } = rawDataModel.getData();
-      const processedData = prices.map(
-        (priceEntry: [number, number], index: number) => {
-          const [timeStampRaw, price] = priceEntry;
-          const date = new Date(timeStampRaw);
-          return {
-            date,
-            price,
-            marketCap: parseFloat(market_caps[index][1].toFixed(2)),
-            volume: parseFloat(total_volumes[index][1].toFixed(2)),
-          };
-        }
+    try {
+      await rawDataModel.loadData(
+        url,
+        oParameters,
+        true,
+        "GET",
+        false,
+        true,
+        this.getHeaders()
       );
-      this.setProperty("/cryptoDetail", processedData);
-    });
-  }
 
-  changeSelectedDays(days: string | undefined) {
-    if (!days) {
-      console.error("Days argument is not valid!", days);
+      return rawDataModel.getData() as Promise<CoinHistoryByIdData>;
+    } catch (error) {
+      console.error(error);
       return;
     }
-    this.setProperty("/selectedDays", days);
   }
 }
