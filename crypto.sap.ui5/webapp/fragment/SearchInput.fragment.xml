@@ -11,6 +11,7 @@
                 class="sapUiSmallMargin"
                 id="SearchLabel"
             />
+            <!-- TODO Add new onSuggest and onSearch functionality. Search API? -->
             <Input
                 id="SearchInput"
                 width="200px"

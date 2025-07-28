@@ -78,31 +78,42 @@
                             <SegmentedButtonItem
                                 id="daysSelectionSegmentedButtonItem1"
                                 key="1"
-                                text="1D"
+                                text="1 Day"
+                                width="140px"
                             />
                             <SegmentedButtonItem
                                 id="daysSelectionSegmentedButtonItem2"
                                 key="7"
-                                text="7D"
+                                text="7 Days"
+                                width="140px"
                             />
                             <SegmentedButtonItem
                                 id="daysSelectionSegmentedButtonItem3"
                                 key="30"
-                                text="1M"
+                                text="1 Month"
+                                width="140px"
                             />
                             <SegmentedButtonItem
                                 id="daysSelectionSegmentedButtonItem4"
                                 key="180"
-                                text="6M"
+                                text="6 Months"
+                                width="140px"
                             />
                             <SegmentedButtonItem
                                 id="daysSelectionSegmentedButtonItem5"
                                 key="365"
-                                text="1Y"
+                                text="1 Year"
+                                width="140px"
                             />
                         </items>
                     </SegmentedButton>
                 </HBox>
+                <MessageStrip
+                    id="InfoMessageStripZoomInOut"
+                    text="Tip: Use Ctrl + mouse wheel to zoom in/out the chart. Double-click to reset zoom."
+                    type="Information"
+                    showIcon="true"
+                />
             </VBox>
         </content>
     </Page>

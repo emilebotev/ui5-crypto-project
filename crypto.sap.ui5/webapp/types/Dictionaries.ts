@@ -3,7 +3,7 @@ import TopMarketCap from "../controller/TopMarketCap.controller";
 export enum ModelNamesDictionary {
   cryptoModel = "cryptoModel",
   topMarketCap = "topMarketCap",
-  cryptoDetail = "cryptoDetail"
+  cryptoDetail = "cryptoDetail",
 }
 
 // Crypto Model Properties
@@ -19,7 +19,8 @@ export enum TMCModelPropsDictionary {
 }
 
 export enum CryptoDetailModelPropsDictionary {
-  cryptoDetail = '/cryptoDetail',
+  cryptoName = "/cryptoName",
+  cryptoDetail = "/cryptoDetail",
   selectedDays = "/selectedDays",
   priceAxisRange = "/priceAxisRange",
 }

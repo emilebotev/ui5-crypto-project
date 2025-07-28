@@ -7,10 +7,7 @@ import {
   CryptoModelPropsDictionary,
   ModelNamesDictionary,
 } from "../types/Dictionaries";
-import SapEvent from "sap/ui/base/Event";
-import VizFrame, {
-  VizFrame$RenderCompleteEvent,
-} from "sap/viz/ui5/controls/VizFrame";
+import VizFrame from "sap/viz/ui5/controls/VizFrame";
 import { Router$RouteMatchedEvent } from "sap/ui/core/routing/Router";
 import CryptoDetailModel from "../model/cryptoDetailModel";
 import { createCryptoDetailModel } from "../model/models";
@@ -25,7 +22,8 @@ interface PriceAxisRange {
 }
 
 export default class CryptoDetail extends BaseController {
-  detailCryptoId: string;
+  private detailCryptoId: string;
+  private selectedCurrency: string;
   private cryptoDetailModel: CryptoDetailModel;
   private readonly routeName = "CryptoDetail";
   private lastRange: PriceAxisRange | undefined;
@@ -50,7 +48,8 @@ export default class CryptoDetail extends BaseController {
       CryptoModelPropsDictionary.selectedCurrency
     );
 
-    this.setVizFrameProps(selectedCurrency);
+    this.selectedCurrency = selectedCurrency;
+
     cryptoModel
       .bindProperty(CryptoModelPropsDictionary.selectedCurrency)
       .attachChange(this.onCurrencyChange, this);
@@ -77,7 +76,7 @@ export default class CryptoDetail extends BaseController {
     this.setPriceAxisRange();
   }
 
-  private setVizFrameProps(selectedCurrency: string) {
+  private setVizFrameProps(selectedCurrency: string, name?: string) {
     const cryptoVizFrame = this.byId("cryptoDetailVizFrame");
     if (!cryptoVizFrame) {
       console.error("CryptoVizFrame not found", cryptoVizFrame);
@@ -86,7 +85,9 @@ export default class CryptoDetail extends BaseController {
     (cryptoVizFrame as VizFrame).setVizProperties({
       title: {
         visible: true,
-        text: `Price (${selectedCurrency.toUpperCase()})`,
+        text: `${
+          name?.toUpperCase() ?? ""
+        } Price (${selectedCurrency.toUpperCase()})`,
       },
       valueAxis: {
         title: {
@@ -102,9 +103,8 @@ export default class CryptoDetail extends BaseController {
       .getSource()
       .getModel()
       .getProperty(CryptoModelPropsDictionary.selectedCurrency);
-    this.setVizFrameProps(newlySelectedCurrency);
-
     this.cryptoDetailModel.getCoinHistoryById(this.detailCryptoId);
+    this.setVizFrameProps(newlySelectedCurrency, this.detailCryptoId);
   }
 
   private onAnyRouteMatched(oEvent: Router$RouteMatchedEvent) {
@@ -133,9 +133,10 @@ export default class CryptoDetail extends BaseController {
     this.detailCryptoId = sId;
     this.cryptoDetailModel.getCoinHistoryById(sId);
     this.setPriceAxisRange();
+    this.setVizFrameProps(this.selectedCurrency, sId);
   }
 
-  onRenderComplete(e: VizFrame$RenderCompleteEvent) {
+  onRenderComplete() {
     this.setPriceAxisRange();
   }
 
@@ -165,7 +166,15 @@ export default class CryptoDetail extends BaseController {
     this.lastRange = range;
 
     (cryptoVizFrame as VizFrame).setVizProperties({
+      // Maximum zoom out always, to avoid horizontal scroll
+      plotArea: {
+        window: {
+          start: null,
+          end: null,
+        },
+      },
       valueAxis: {
+        // Applying the range ( with 15% padding ) to the price range axis for better visibility of price action
         scale: {
           fixedRange: true,
           minValue: range.min,
